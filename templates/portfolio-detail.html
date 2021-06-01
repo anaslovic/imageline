@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/portfolio-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="header-image">
+            <img src="{{ portfolio.cover_image.url }}">
+        </div>
+        <div class="profile-pic">
+            <img src="{{ portfolio.profile_pic.url }}">
+        </div>
+        <div class="profile-info justify-content-center text-center">
+            <h2 class="text-light" style="font-family: 'Kaushan Script', cursive">{{ portfolio.artistic_name}}</h2>
+            <h6 class="text-muted mt-1" style="font-style: italic">@{{ portfolio.photographer.username }}</h6>
+            <div class=" row justify-content-center">
+                <div class="col-6">
+                    <p class="text-light text-center p-1" style="font-weight: lighter; font-size: 15px">
+                        {{ portfolio.bio }}
+                    </p>
+                </div>
+            </div>
+            <h5 class="text-light">
+                <i class="bi bi-geo-alt text-light"></i>
+                {{ portfolio.location }}</h5>
+            {% if user.is_authenticated and portfolio.photographer.id == user.id  %}
+                <a href="{% url 'portfolio-update' portfolio.pk %}" class="btn btn-info text-center mt-2 mb-2 me-3" style="width: 12%">
+                Update portfolio
+                </a>
+                <a href="{% url 'add-photo' %}" class="btn btn-info text-center mt-2 mb-2 ms-3" style="width: 12%">
+                Add photo
+                </a>
+            {% endif %}
+         </div>
+        <hr>
+    </div>
+    <div class="main mt-4 mb-4" style="background-color: #282828">
+        <div class="container p-3">
+            {% for photo in portfolio.photo_set.all %}
+            <div class="img-holder">
+               <a href="{% url 'portfolio-photo-detail' photo.pk %}"><img src="{{photo.image.url}}" alt=""></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

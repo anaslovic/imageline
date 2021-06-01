@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/discover-artists.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="text-center p-3">
+            <h1 class="text-center text-warning" style="font-weight: bold">Photographers</h1>
+        </div>
+        <div class="row justify-content-center p-2">
+            <div class="col-md-4">
+                <form method="GET" action="{% url 'search-artists' %}">
+                    <input class="form-control me-2 mt-2 mb-2" type="search" placeholder="search photographers..." name="search"
+                           required>
+                    <button class="btn btn-outline-warning mt-2" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="profile-area">
+        <div class="container-fluid" style="background-color: #282828">
+            <div class="row">
+                {% for portfolio in portfolio_list %}
+                    <div class="col-md-4 col-xs-12 col-sm-6 col-lg-3 mt-3 mb-3">
+                        <div class="card h-100">
+                            <div class="img1">
+                                <img src="{{ portfolio.cover_image.url }}">
+                            </div>
+                            <div class="img2">
+                                <a class="text-decoration-none text-dark" href="{% url 'portfolio-detail' portfolio.pk %}">
+                                    <img src="{{portfolio.profile_pic.url}}">
+                                </a>
+                            </div>
+                            <div class="main-text">
+                                <a class="text-decoration-none text-dark" href="{% url 'portfolio-detail' portfolio.pk %}">
+                                    <h2>{{ portfolio.artistic_name }}</h2>
+                                </a>
+                                <p>
+                                    {{ portfolio.bio|truncatechars:150 }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

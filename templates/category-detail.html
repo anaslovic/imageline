@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/discover-photos.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% if cat_exists %}
+        <div class="container">
+            <h1 class="text-center text-warning p-3" style="font-weight: bold">{{ category }} photography</h1>
+        </div>
+        <div class="container">
+            <div class="text-center p-3">
+                {% for cat in all_cats %}
+                    <a href="{% url 'category-detail' cat %}"
+                       class="btn btn-light text-dark me-3 ms-3">{{ cat.name }}</a>
+                {% endfor %}
+                <a href="{% url 'discover-photos' %}" class="btn btn-warning text-dark me-3 ms-3">
+                    All photos
+                </a>
+            </div>
+        </div>
+        {% if category_photos %}
+            <div class="main">
+                <div class="container p-3 h-100" style="background-color: #282828">
+                    {% for photo in category_photos %}
+                        <div class="img-holder">
+                           <a href="{% url 'category-photo-detail' category photo.pk %}"><img src="{{ photo.image.url }}" alt=""></a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="container">
+                <h1 class="text-center text-info p-5" style="font-weight: bold">There are no photos in this category.</h1>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="container">
+            <h1 class="text-center text-danger p-5" style="font-weight: bold">Sorry, this page doesn't exist.</h1>
+        </div>
+    {% endif %}
+{% endblock %}

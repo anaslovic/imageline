@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/discover-photos.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="text-center p-3">
+            <h1 class="text-center text-warning p-3" style="font-weight: bold">View by categories</h1>
+            {% for cat in categories %}
+                <a href="{% url 'category-detail' cat%}" class="btn btn-light text-dark me-3 ms-3">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+        <div class="row justify-content-center p-3">
+            <div class="col-md-4">
+                <form method="GET" action="{% url 'search-photos' %}">
+                    <input class="form-control me-2 mt-2 mb-2" type="search" placeholder="search photos..." name="search"
+                           required>
+                    <button class="btn btn-outline-warning mt-2" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="main">
+        <div class="container p-3 h-100" style="background-color: #282828">
+            {% for photo in photo_list %}
+                <div class="img-holder">
+                   <a href="{% url 'discover-photo-detail' photo.pk %}"><img src="{{ photo.image.url }}" alt=""></a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

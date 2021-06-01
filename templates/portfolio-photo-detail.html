@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/photo-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid" style="background-color: #282828;height: 70vh;">
+        <div class="row justify-content-center">
+            <div class="col-md-1 my-auto text-center">
+                {% if photo.portfolio.photographer == prev_ph.portfolio.photographer %}
+                    <a href="{% url 'portfolio-photo-detail' prev_ph.pk %}" class="text-decoration-none">
+                        <i class="bi bi-chevron-double-left text-light" style="font-size: 40px"></i>
+                    </a>
+                {% else %}
+                    <i class="bi bi-chevron-double-left text-muted" style="font-size: 40px"></i>
+                {% endif %}
+            </div>
+
+            <div class="col-md-10" style="height: 70vh;">
+                <div class="pic justify-content-center text-center">
+                    <img class="mx-auto" src="{{ photo.image.url }}">
+                </div>
+            </div>
+            <div class="col-md-1 my-auto text-center">
+                {% if photo.portfolio.photographer == next_ph.portfolio.photographer %}
+                    <a href="{% url 'portfolio-photo-detail' next_ph.pk %}" class="text-decoration-none">
+                        <i class="bi bi-chevron-double-right text-light" style="font-size: 40px"></i>
+                    </a>
+                {% else %}
+                        <i class="bi bi-chevron-double-right text-muted" style="font-size: 40px"></i>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-5 mt-3 mb-3 ms-3 me-3 rounded-3" style="background-color: #282828">
+                <div class="profile-pic ms-3 p-3 float-start">
+                    <img src="{{photo.portfolio.profile_pic.url}}">
+                </div>
+                <div class="text-left mt-3">
+                    <h2 class="text-light text-left" style="">{{ photo.title }}</h2>
+                    <h6 class="text-muted text-left" style="font-style: italic">
+                        Published by
+                        <a class="text-info text-decoration-none" href="{% url 'portfolio-detail' photo.portfolio.pk%}">
+                            {{ photo.portfolio.photographer.username }}
+                        </a>
+                        on {{ photo.upload_date|date:"M d, Y" }} in
+                        <a class="text-info text-decoration-none" href="{% url 'category-detail' photo.category %}">
+                            {{ photo.category.lower }}
+                        </a> category.
+                    </h6>
+                    {% if user.is_authenticated and user.id == photo.portfolio.photographer.id or not user.is_authenticated %}
+                        <h5 class="text-light">
+                            <i class="bi bi-heart-fill text-info"></i> {{ photo.like_set.count }}
+                        </h5>
+                    {% elif user.is_authenticated %}
+                        {% if user.id != photo.portfolio.photographer.id %}
+                            {% if liked %}
+                                <form method="POST" action="{% url 'dislike-photo' photo.pk %}" id="flike">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <a href="#" onclick="document.getElementById('flike').submit();" class="text-decoration-none">
+                                        <h5 class="text-light">
+                                            <i class="bi bi-heart-fill text-info"></i> {{ photo.like_set.count }}
+                                        </h5>
+                                    </a>
+                                </form>
+                            {% elif not liked %}
+                                <form method="POST" action="{% url 'like-photo' photo.pk %}" id="fdislike">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <a href="#" onclick="document.getElementById('fdislike').submit();" class="text-decoration-none">
+                                        <h5 class="text-light">
+                                            <i class="bi bi-heart text-info"></i> {{ photo.like_set.count }}
+                                        </h5>
+                                    </a>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    <hr>
+                </div>
+                <h3 class="text-light text-center mt-3 ms-2" style="font-family: 'Kaushan Script', cursive">Photo details:</h3>
+                <div class="text-light ms-2 me-2 mb-3 border border-light">
+                    <p class="mt-3" style="font-size: 20px">
+                        <i class="bi bi-dot text-light"></i>
+                        Photo description:
+                    </p>
+                    <p class="mb-3 ms-4 me-4">{{ photo.description }}</p>
+                    <p style="font-size: 20px">
+                        <i class="bi bi-dot text-light"></i>
+                        Gear:
+                    </p>
+                    <p class="mb-3 ms-4">
+                        <i class="bi bi-camera-fill text-light"></i>
+                        Camera: {{ photo.camera_name }}
+                    </p>
+                    <p class="mb-3 ms-4">
+                        <i class="bi bi-disc text-light"></i>
+                        Lens: {{ photo.lens }}
+                    </p>
+                    <p class="mb-3 ms-4">
+                        <i class="bi bi-brightness-high-fill text-light"></i>
+                        Light: {{ photo.used_light }}
+                    </p>
+                </div>
+                {% if user.is_authenticated %}
+                    {% if user.id == photo.portfolio.photographer.id %}
+                        <div class="text-center p-2 mb-3">
+                            <a href="{% url 'edit-photo' photo.pk %}" class="btn btn-info btn-sm">Edit photo</a>
+                            <a href="{% url 'delete-photo' photo.pk %}" class="btn btn-danger btn-sm">Delete
+                                photo</a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-5 mt-3 mb-3 ms-3 me-3 rounded-3" style="background-color: #282828">
+                <h2 class="text-light text-center mt-4 mb-3" style="font-family: 'Kaushan Script', cursive">Comments</h2>
+                <hr>
+                {% if photo.comment_set.all  %}
+                    <div {% if not user.is_authenticated %}class="text-light ms-3 me-3 mb-3 border border-info overflow-auto h-75"
+                         {% else %} class="text-light ms-3 me-3 mb-3 border border-info overflow-auto" style="height: 240px"{% endif %}>
+                         <div class="p-2">
+                            {% for comment in photo.comment_set.all %}
+                                <h6 class="text-light text-left ms-2 mt-2">
+                                    {{ comment.author.first_name }} {{ comment.author.last_name }} (
+                                    <a class="text-info text-decoration-none" href="{% url 'portfolio-detail' photo.portfolio.pk %}">
+                                        @{{ comment.author.username }}
+                                    </a>), commented on {{ comment.created_on }}
+                                    {% if user.is_authenticated and user.id == comment.author.id %}
+                                        <form method="POST" action="{% url 'remove-comment' photo.pk comment.id %}" id="comform">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="goto" value="{{ request.path }}">
+                                            <a href="#" onclick="document.getElementById('comform').submit();"
+                                                class="text-danger text-decoration-none mt-2">
+                                            (Delete)
+                                            </a>
+                                        </form>
+                                    {% endif %}
+                                </h6>
+                                <h6 class="text-left text-light ms-2  mb-3" style="font-style: italic">
+                                    {{ comment.body }}
+                                </h6>
+                                <hr style="width: 98% !important;">
+                            {% endfor %}
+                         </div>
+                    </div>
+                {% else %}
+                    <div {% if not user.is_authenticated %}class="text-light text-center ms-3 me-3 mb-3 border border-info overflow-auto h-75"
+                         {% else %} class="text-light text-center ms-3 me-3 mb-3 border border-info overflow-auto" style="height: 240px" {% endif %}>
+                        <h3 class="mt-5 text-danger">This photo has no comments yet.</h3>
+                    </div>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'add-comment' photo.pk %}" class="text-light ps-4 pe-4 pb-4 pt-2 mt-auto">
+                        {% csrf_token %}
+                        {% for field in comment_form.visible_fields %}
+                            <div class="form-group mb-3">
+                                <label class="mb-2" for="{{field.auto_id}}" style="font-size: 20px">
+                                    <h4></h4>{{ field.label }}
+                                </label>
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+                        {% for field in comment_form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <div class="form-group text-center">
+                            <button  class="btn btn-info btn-sm me-4" type="submit">Post</button>
+                        </div>
+                    </form>
+                {% endif %}
+
+                <script>
+                    document.getElementById("photo").value = "{{ photo.id }}";
+                    document.getElementById("author").value = "{{ user.id }}";
+                </script>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/profile-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if object.id == request.user.id %}
+            <div class="profile-area">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                            <div class="col-md-5 mt-3 mb-3">
+                                <div class="card h-100 rounded border border-info">
+                                    <div class="profile-pic">
+                                            <img src="{{user.portfolio.profile_pic.url}}">
+                                    </div>
+                                    <div class="text-center p-2">
+                                        <h2 class="text-info text-center mb-3" style="font-size: 40px; font-family: 'Kaushan Script', cursive">
+                                            {{ user.first_name }} {{ user.last_name }}
+                                        </h2>
+                                        <hr>
+                                        <h5 class="text-dark ">Username: {{ user.username }}</h5>
+                                        <h5 class="text-dark ">E-mail: {{ user.email }}</h5>
+                                        <div class="text-center">
+                                            <a class="btn btn-info mt-3 text-center text-light" href="{% url 'update-profile' user.pk %}">
+                                                Update profile info
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="container h-100 ">
+                <h1 class="text-center text-light p-5" style="font-weight: bold">Content not available!</h1>
+                <div class=" row justify-content-center  text-center mb-5">
+                    <div class="col-7 border border-light rounded text center" style="background-color: #1a1a1a">
+                        <h3 class="p-3 text-danger">You cannot access this page.</h3>
+                        <a href="{% url 'home' %}" class="btn btn-lg btn-success mb-4">Home</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="container h-100 ">
+            <h1 class="text-center text-light p-5" style="font-weight: bold">Content not available!</h1>
+            <div class=" row justify-content-center  text-center mb-5">
+                <div class="col-7 border border-light rounded text center" style="background-color: #1a1a1a">
+                    <h3 class="p-3 text-danger">You have to be logged in to see this content</h3>
+                    <a href="{% url 'login' %}" class="btn btn-lg btn-success mb-4">Log in</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
